@@ -1,14 +1,11 @@
 <?php
 
-namespace Bundle\PaymentGatewayBundle\Service\AuthorizeNet;
+namespace Bundle\PaymentGatewayBundle\Gateway\AuthorizeNet;
 
-use Bundle\PaymentGatewayBundle\Service\Address;
-use Bundle\PaymentGatewayBundle\Service\Order;
-use Bundle\PaymentGatewayBundle\Service\PaymentGateway as AbstractPaymentGateway;
-use Bundle\PaymentGatewayBundle\Service\PaymentMethod;
+use Bundle\PaymentGatewayBundle\Gateway\PaymentGateway as AbstractPaymentGateway;
 
-class PaymentGateway extends AbstractPaymentGateway {
-	
+class PaymentGateway extends AbstractPaymentGateway
+{
 	CONST VERSION_KEY        = "x_version";
 	CONST DELIM_DATA_KEY     = "x_delim_data";
 	CONST DELIM_CHAR_KEY     = "x_delim_char";
@@ -20,132 +17,155 @@ class PaymentGateway extends AbstractPaymentGateway {
 	private $amount;
 	
 	private $config = array(
-		"version"              => "3.1",
+		"version"             => "3.1",
 		"delimData"           => TRUE,
 		"delimChar"           => "|",
 		"relayResponse"       => FALSE,
 		"curlHeader"          => 0, // set to 0 to eliminate header info from response
-		"curlReturnTransfer" => 1, // Returns response data instead of TRUE(1)
-		"curlSslVerifyPeer" => FALSE,
+		"curlReturnTransfer"  => 1, // Returns response data instead of TRUE(1)
+		"curlSslVerifyPeer"   => FALSE,
 	);
 
 	private $curl;
 	private $response;
 	
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = array())
+	{
 		$this->config = array_merge($this->config, $config);
 	}
 
-	public function connect() {
+	public function connect()
+	{
 		curl_setopt($this->curl, \CURLOPT_HEADER, $this->getCurlOptHeader());
 		curl_setopt($this->curl, \CURLOPT_RETURNTRANSFER, $this->getCurlOptReturnTransfer());
 		curl_setopt($this->curl, \CURLOPT_SSL_VERIFYPEER, $this->getCurlOptSslVerifyPeer());
 	}
 
-	public function disconnect() {
+	public function disconnect()
+	{
 		curl_close($this->curl);
 	}
 
-	public function authorize() {
+	public function authorize()
+	{
 		$this->connect();
 		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $this->getPostStringForAuthorize());
 	
 		$this->disconnect();
 	}
 
-	public function capture() {
+	public function capture()
+	{
 		$this->connect();
 		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $this->getPostStringForCapture());
 
 		$this->disconnect();
 	}
 
-	public function cancel() {
+	public function cancel()
+	{
 		$this->connect();
 		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $this->getPostStringForCancel());		
 
 		$this->disconnect();
 	}
 
-	public function getConfig() {
+	public function getConfig()
+	{
 		return $this->config;
 	}
 
-	public function getApiLoginId() {
+	public function getApiLoginId()
+	{
 		if (array_key_exists('apiLoginId', $this->config)) {
 			return $this->config['apiLoginId'];
 		}
 	}
 
-	public function setApiLoginId($apiLoginId) {
+	public function setApiLoginId($apiLoginId)
+	{
 		return $this->config['apiLoginId'] = (string) $apiLoginId;
 	}
 
-	public function getTransactionKey() {
+	public function getTransactionKey()
+	{
 		if (array_key_exists('transactionKey', $this->config)) {
 			return $this->config['transactionKey'];
 		}
 	}
 
-	public function setTransactionKey($transactionKey) {
+	public function setTransactionKey($transactionKey)
+	{
 		return $this->config['transactionKey'] = (string) $transactionKey;
 	}
 	
-	public function getVersion() {
+	public function getVersion()
+	{
 		if (array_key_exists('version', $this->config)) {
 			return $this->config['version'];
 		}
 	}
 
-	public function setVersion($version) {
+	public function setVersion($version)
+	{
 		return $this->config['version'] = (string) $version;
 	}
 
-	public function getDelimData() {
+	public function getDelimData()
+	{
 		if (array_key_exists('delimData', $this->config)) {
 			return $this->config['delimData'];
 		}
 	}
 
-	public function setDelimData($delimData) {
+	public function setDelimData($delimData)
+	{
 		return $this->config['delimData'] = (bool) $delimData;
 	}
 
-	public function getDelimChar() {
+	public function getDelimChar()
+	{
 		if (array_key_exists('delimChar', $this->config)) {
 			return $this->config['delimChar'];
 		}
 	}
 
-	public function setDelimChar($delimChar) {
+	public function setDelimChar($delimChar)
+	{
 		return $this->config['delimChar'] = (string) $delimChar;
 	}
 
-	public function getRelayResponse() {
+	public function getRelayResponse()
+	{
 		if (array_key_exists('relayResponse', $this->config)) {
 			return $this->config['relayResponse'];
 		}
 	}
 
-	public function setRelayResponse($relayResponse) {
+	public function setRelayResponse($relayResponse)
+	{
 		return $this->config['relayResponse'] = (bool) $relayResponse;
 	}
 	
-	public function getPostUrl() {
+	public function getPostUrl()
+	{
 		if (array_key_exists('postUrl', $this->config)) {
 			return $this->config['postUrl'];
 		}
 	}
 
-	public function setPostUrl($postUrl) {
+	public function setPostUrl($postUrl)
+	{
 		return $this->config['postUrl'] = (string) $postUrl;
 	}
 
-	public function getCurl() {
+	public function getCurl()
+	{
 		return $this->curl;
 	}
 
-	public function setCurl($curl = null) {
+	public function setCurl($curl = null)
+	{
 		if ($culr) {
 			$this->curl = $culr;
 		}	else {
@@ -153,11 +173,13 @@ class PaymentGateway extends AbstractPaymentGateway {
 		}
 	}
 
-	public function getResponse() {
+	public function getResponse()
+	{
 		return $this->response;
 	}
 
-	private function curlExec() {
+	private function curlExec()
+	{
 		$this->response = curl_exec($this->getCurl());
 	}
 
