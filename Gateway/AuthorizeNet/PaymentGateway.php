@@ -384,7 +384,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		$expireYear  = $this->getPaymentMethod()->getExpireYear();
 
 		if (1 == strlen($expireMonth)) {
-			$expireMonth .= "0".$expireMonth;
+			$expireMonth = "0".$expireMonth;
 		}
 		if (strlen($expireYear) > 2) {
 			$expireYear = substr($expireYear, (strlen($expireYear) - 2)); 
