@@ -27,13 +27,13 @@ class PaymentGateway extends AbstractPaymentGateway
 	CONST VERSION_KEY        = "x_version";
 	CONST ZIP_KEY            = "x_zip";
 
-	private $address;
-	private $amount;
-	private $order;
-	private $paymentMethod;
-	private $postFields = array();
-	
-	private $config = array(
+	protected $address;
+	protected $amount;
+	protected $order;
+	protected $paymentMethod;
+	protected $postFields = array();
+
+	protected $config = array(
 		"version"             => "3.1",
 		"delimData"           => TRUE,
 		"delimChar"           => "|",
@@ -169,6 +169,22 @@ class PaymentGateway extends AbstractPaymentGateway
 		}
 	}
 
+	public function getCurlOptReturnTransfer()
+	{
+		if (array_key_exists('curlReturnTransfer', $this->config))
+		{
+			return $this->config['curlReturnTransfer'];
+		}
+	}
+
+	public function getCurlOptSslVerifyPeer()
+	{
+		if (array_key_exists('curlSslVerifyPeer', $this->config))
+		{
+			return $this->config['curlSslVerifyPeer'];
+		}
+	}
+
 	public function setDelimChar($delimChar)
 	{
 		return $this->config['delimChar'] = (string) $delimChar;
@@ -270,7 +286,6 @@ class PaymentGateway extends AbstractPaymentGateway
 			throw new \Exception('Amount Required');
 		}
 		$this->addPostField(static::AMOUNT_KEY, $this->getAmount());
-		return $postString;
 	}
 
 	protected function addConnectionToPost()
@@ -326,8 +341,8 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->addPostField(static::METHOD_KEY, static::METHOD_CC_VAL);
 		$this->addPostField(static::CC_NUM_KEY, $this->getPaymentMethod()->getNumber());
 
-		$expireMonth = $this->getPaymentMethod->getExpireMonth();
-		$expireYear  = $this->getPaymentMethod->getExpireYear();
+		$expireMonth = $this->getPaymentMethod()->getExpireMonth();
+		$expireYear  = $this->getPaymentMethod()->getExpireYear();
 
 		if (1 == strlen($expireMonth)) {
 			$expireMonth .= "0".$expireMonth;
@@ -335,7 +350,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		if (strlen($expireYear) > 2) {
 			$expireYear = substr($expireYear, (strlen($expireYear) - 2)); 
 		}
-		$expDate = $expireMonth.$expireYear;
+		$expireDate = $expireMonth.$expireYear;
 		$this->addPostField(static::CC_EXP_DATE, $expireDate);
 	}
 

@@ -7,6 +7,11 @@ use Bundle\PaymentGatewayBundle\Transaction\OrderInterface;
 
 abstract class PaymentGateway implements PaymentGatewayInterface
 {
+	protected $address;
+	protected $amount;
+	protected $order;
+	protected $paymentMethod;
+
 	public function connect()
 	{
 	
