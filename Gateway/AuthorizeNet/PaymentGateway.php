@@ -84,7 +84,9 @@ class PaymentGateway extends AbstractPaymentGateway
 		$postFields = $this->createEncodedPostFields();
 
 		$this->connect();
-		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postFields);	
+		curl_setopt($this->getCurl(), \CURLOPT_POSTFIELDS, $postFields);	
+		$this->curlExec();
+		$this->hasResponseErrors();
 		$this->disconnect();
 	}
 
@@ -98,7 +100,9 @@ class PaymentGateway extends AbstractPaymentGateway
 		$postFields = $this->createEncodedPostFields();
 
 		$this->connect();
-		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postFields);
+		curl_setopt($this->getCurl(), \CURLOPT_POSTFIELDS, $postFields);
+		$this->curlExec();
+		$this->hasResponseErrors();
 		$this->disconnect();
 	}
 
@@ -152,6 +156,10 @@ class PaymentGateway extends AbstractPaymentGateway
 		}
 		else
 		{
+			if (null === $this->getPostUrl())
+			{
+				throw new \Exception('POST URL is Required');
+			}
 			$this->curl = curl_init($this->getPostUrl());
 		}
 	}
@@ -387,6 +395,18 @@ class PaymentGateway extends AbstractPaymentGateway
 	public function getResponse()
 	{
 		return $this->response;
+	}
+
+	public function hasResponseErrors()
+	{
+		if ($this->response)
+		{
+			$response = explode($this->getDelimChar(), $this->response);
+			print_r("<pre>");
+			print_r($response);
+			print_r("</pre>");
+			die();
+		}
 	}
 
 	public function setTransactionKey($transactionKey)
