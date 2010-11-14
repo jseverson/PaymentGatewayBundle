@@ -28,9 +28,10 @@ class PaymentGateway extends AbstractPaymentGateway
 	CONST ZIP_KEY            = "x_zip";
 
 	private $address;
-	private $paymentMethod;
-	private $order;
 	private $amount;
+	private $order;	
+	private $paymentMethod;
+	private $postFields = array();
 	
 	private $config = array(
 		"version"             => "3.1",
@@ -77,14 +78,14 @@ class PaymentGateway extends AbstractPaymentGateway
 	{
 		$this->connect();
 
-		$postString = '';
-		$postString .= $this->encodeKeyVal(static::TYPE_KEY, static::TYPE_AUTH_VAL);
-		$postString .= $this->createConnectionPostString();
-		$postString .= $this->createAmountPostString();
-		$postString .= $this->createPaymentMethodPostString();
-		$postString .= $this->createAddressPostString();
+		$this->addPostField(static::TYPE_KEY, static::TYPE_AUTH_VAL);
+		$this->addConnectionToPost();
+		$this->addAmountToPost();
+		$this->addPaymentMethodToPost();
+		$this->addAddressToPost();
+		$postFields = $this->createEncodedPostFields();
 
-		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postString);
+		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postFields);
 	
 		$this->disconnect();
 	}
@@ -93,14 +94,14 @@ class PaymentGateway extends AbstractPaymentGateway
 	{
 		$this->connect();
 		
-		$postString = '';
-		$postString .= $this->encodeKeyVal(static::TYPE_KEY, static::TYPE_CAPTURE_VAL);
-		$postString .= $this->createConnectionPostString();
-		$postString .= $this->createAmountPostString();
-		$postString .= $this->createPaymentMethodPostString();
-		$postString .= $this->createAddressPostString();
+		$this->addPostField(static::TYPE_KEY, static::TYPE_CAPTURE_VAL);
+		$this->addConnectionToPost();
+		$this->addAmountToPost();
+		$this->addPaymentMethodToPost();
+		$this->addAddressToPost();
+		$postFields = $this->createEncodedPostFields();
 
-		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postString);
+		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postFields);
 
 		$this->disconnect();
 	}
@@ -118,9 +119,15 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->response = curl_exec($this->getCurl());
 	}
 
-	private function encodeKeyVal($key, $val)
+	public function createEncodedPostFields()
 	{
-		return $key. "=" .urlencode($val) . "&";
+		$out = '';		
+		foreach ($this->postFields as $key => $val)
+		{
+			$out .= $key. '=' .  .urlencode($val) . "&";
+		}
+		$out = rtrim( $out, "& " );
+		return $out;
 	}
 
 	public function setApiLoginId($apiLoginId)
@@ -205,7 +212,30 @@ class PaymentGateway extends AbstractPaymentGateway
 		}
 	}
 
-	protected function createAddressPostString()
+	public function setPostFields(array $postFields = array())
+	{
+		$this->postFields = $postFields;
+	}
+
+	public function getPostFields()
+	{
+		return $this->postFields;
+	}
+
+	protected function addPostField($key, $val)
+	{
+		$this->postFields[$key] = $val;
+	}
+
+	protected function removePostField($key)
+	{
+		if (array_key_exists($key, $this->postFields))
+		{
+			unset($this->postFields[$key]);
+		}
+	}
+
+	protected function addAddressToPost()
 	{
 		if (null === $this->getAddress())
 		{
@@ -231,26 +261,23 @@ class PaymentGateway extends AbstractPaymentGateway
 		{
 			throw new \Exception('Postal Code is Required');
 		}
-		$postString = '';
-		$postString .= $this->encodeKeyVal(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
-		$postString .= $this->encodeKeyVal(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
-		$postString .= $this->encodeKeyVal(static::ADDRESS_KEY, $this->getAddress()->getStreet1());
-		$postString .= $this->encodeKeyVal(static::STATE_KEY, $this->getAddress()->getState());
-		$postString .= $this->encodeKeyVal(static::ZIP_KEY, $this->getAddress()->getPostalCode());
-		return $postString;	
+		$this->addPostField(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
+		$this->addPostField(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
+		$this->addPostField(static::ADDRESS_KEY, $this->getAddress()->getStreet1());
+		$this->addPostField(static::STATE_KEY, $this->getAddress()->getState());
+		$this->addPostField(static::ZIP_KEY, $this->getAddress()->getPostalCode());
 	}
 
-	protected function createAmountPostString()
-	{
-		$postString = '';		
+	protected function addAmountToPost()
+	{		
 		if (null === $this->getAmount()) {
 			throw new \Exception('Amount Required');
 		}
-		$postString .= $this->encodeKeyVal(static::AMOUNT_KEY, $this->getAmount());
+		$this->addPostField(static::AMOUNT_KEY, $this->getAmount());
 		return $postString;
 	}
 
-	protected function createConnectionPostString()
+	protected function addConnectionToPost()
 	{
 		if (null === $this->getApiLoginId()) {
 			throw new \Exception('API Login ID Required');
@@ -272,19 +299,17 @@ class PaymentGateway extends AbstractPaymentGateway
 		}
 		if (null === $this->getDescription()) {
 			throw new \Exception('Description Required');
-		}
-		$postString = '';		
-		$postString .= $this->encodeKeyVal(static::API_LOGIN_ID_KEY, $this->getApiLoginId());
-		$postString .= $this->encodeKeyVal(static::TRANSACTION_KEY, $this->getTransactionKey());		
-		$postString .= $this->encodeKeyVal(static::VERSION_KEY, $this->getVersion());		
-		$postString .= $this->encodeKeyVal(static::DELIM_DATA_KEY, $this->getDelimData();		
-		$postString .= $this->encodeKeyVal(static::DELIM_CHAR_KEY, $this->getDelimChar());				
-		$postString .= $this->encodeKeyVal(static::RELAY_RESPONSE_KEY, $this->getRelayResponse());
-		$postString .= $this->encodeKeyVal(static::DESC_KEY, $this->getDescription());		
-		return $postString;
+		}	
+		$this->addPostField(static::API_LOGIN_ID_KEY, $this->getApiLoginId());
+		$this->addPostField(static::TRANSACTION_KEY, $this->getTransactionKey());		
+		$this->addPostField(static::VERSION_KEY, $this->getVersion());		
+		$this->addPostField(static::DELIM_DATA_KEY, $this->getDelimData();		
+		$this->addPostField(static::DELIM_CHAR_KEY, $this->getDelimChar());				
+		$this->addPostField(static::RELAY_RESPONSE_KEY, $this->getRelayResponse());
+		$this->addPostField(static::DESC_KEY, $this->getDescription());	
 	}
 
-	protected function createPaymentMethodPostString()
+	protected function addPaymentMethodToPost()
 	{
 		if (null === $this->getPaymentMethod())
 		{
@@ -294,20 +319,16 @@ class PaymentGateway extends AbstractPaymentGateway
 		{
 			throw new \Exception('Payment Method Number Required');
 		}
-		if (null === $this->getPaymentMethod()->getExp$postString = '';
-		$postString .= $this->createConnectionPostString();
-		$postString .= $this->createAmountPostString();
-		$postString .= $this->createAmountPostString();ireMonth())
+		if (null === $this->getPaymentMethod()->getExpireMonth())
 		{
 			throw new \Exception('Credit Card Expiration Month Required');
 		}
 		if (null === $this->getPaymentMethod()->getExpireYear())
 		{
 			throw new \Exception('Credit Card Expiration Year Required');
-		}
-		$postString = '';		
-		$postString .= $this->encodeKeyVal(static::METHOD_KEY, static::METHOD_CC_VAL);		
-		$postString .= $this->encodeKeyVal(static::CC_NUM_KEY, $this->getPaymentMethod()->getNumber());
+		}	
+		$this->addPostField(static::METHOD_KEY, static::METHOD_CC_VAL);		
+		$this->addPostField(static::CC_NUM_KEY, $this->getPaymentMethod()->getNumber());
 		
 		$expireMonth = $this->getPaymentMethod->getExpireMonth();
 		$expireYear  = $this->getPaymentMethod->getExpireYear();		
@@ -319,8 +340,7 @@ class PaymentGateway extends AbstractPaymentGateway
 			$expireYear = substr($expireYear, (strlen($expireYear) - 2)); 
 		}
 		$expDate = $expireMonth.$expireYear;
-		$postString .= $this->encodeKeyVal(static::CC_EXP_DATE, $expireDate);
-		return $postString;	
+		$this->addPostField(static::CC_EXP_DATE, $expireDate);
 	}
 
 	public function setPostUrl($postUrl)
