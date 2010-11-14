@@ -76,7 +76,15 @@ class PaymentGateway extends AbstractPaymentGateway
 	public function authorize()
 	{
 		$this->connect();
-		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $this->getPostStringForAuthorize());
+
+		$postString = '';
+		$postString .= $this->encodeKeyVal(static::TYPE_KEY, static::TYPE_AUTH_VAL);
+		$postString .= $this->createConnectionPostString();
+		$postString .= $this->createAmountPostString();
+		$postString .= $this->createPaymentMethodPostString();
+		$postString .= $this->createAddressPostString();
+
+		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postString);
 	
 		$this->disconnect();
 	}
@@ -84,7 +92,15 @@ class PaymentGateway extends AbstractPaymentGateway
 	public function capture()
 	{
 		$this->connect();
-		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $this->getPostStringForCapture());
+		
+		$postString = '';
+		$postString .= $this->encodeKeyVal(static::TYPE_KEY, static::TYPE_CAPTURE_VAL);
+		$postString .= $this->createConnectionPostString();
+		$postString .= $this->createAmountPostString();
+		$postString .= $this->createPaymentMethodPostString();
+		$postString .= $this->createAddressPostString();
+
+		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postString);
 
 		$this->disconnect();
 	}
@@ -102,7 +118,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->response = curl_exec($this->getCurl());
 	}
 
-	static private function encodeKeyVal($key, $val)
+	private function encodeKeyVal($key, $val)
 	{
 		return $key. "=" .urlencode($val) . "&";
 	}
@@ -189,79 +205,8 @@ class PaymentGateway extends AbstractPaymentGateway
 		}
 	}
 
-	public function getPostStringRequirements()
+	protected function createAddressPostString()
 	{
-		$postString = '';
-		if (null === $this->getApiLoginId()) {
-			throw new \Exception('API Login ID Required');
-		}
-		$postString .= static::encodeKeyVal(static::API_LOGIN_ID_KEY, $this->getApiLoginId());
-		if (null === $this->getTransactionKey()) {
-			throw new \Exception('Transaction Key Required');
-		}
-		$postString .= static::encodeKeyVal(static::encodeKeyValue(static::TRANSACTION_KEY, $this->getTransactionKey());
-		if (null === $this->getVersion()) {
-			throw new \Exception('Version Required');
-		}
-		$postString .= static::encodeKeyVal(static::VERSION_KEY, $this->getVersion());
-		if (null === $this->getDelimData()) {
-			throw new \Exception('Data Delimiter Required');
-		}
-		$postString .= static::encodeKeyVal(static::DELIM_DATA_KEY, $this->getDelimData();
-		if (null === $this->getDelimChar()) {
-			throw new \Exception('Character Delimiter Required');
-		}
-		$postString .= static::encodeKeyVal(static::DELIM_CHAR_KEY, $this->getDelimChar());
-		if (null === $this->getRelayResponse()) {
-			throw new \Exception('Relay Response type Required');
-		}
-		$postString .= static::encodeKeyVal(static::RELAY_RESPONSE_KEY, $this->getRelayResponse());
-		if (null === $this->getAmount()) {
-			throw new \Exception('Amount Required');
-		}
-		$postString .= static::encodeKeyVal(static::AMOUNT_KEY, $this->getAmount());
-		if (null === $this->getDescription()) {
-			throw new \Exception('Description Required');
-		}
-		$postString .= static::encodeKeyVal(static::DESC_KEY, $this->getDescription());
-		return $postString;
-	}
-
-	public function getPostStringDepsForAuthorizeAndCapture() {
-		$postString = '';
-		$postString .= $this->getPostStringRequirements();
-	
-		if (null === $this->getPaymentMethod())
-		{
-			throw new \Exception('Payment Method Required');
-		}
-		if (null === $this->getPaymentMethod()->getNumber())
-		{
-			throw new \Exception('Payment Method Number Required');
-		}
-		if (null === $this->getPaymentMethod()->getExpireMonth())
-		{
-			throw new \Exception('Credit Card Expiration Month Required');
-		}
-		if (null === $this->getPaymentMethod()->getExpireYear())
-		{
-			throw new \Exception('Credit Card Expiration Year Required');
-		}
-		$postString .= static::encodeKeyVal(static::METHOD_KEY, static::METHOD_CC_VAL);		
-		$postString .= static::encodeKeyVal(static::CC_NUM_KEY, $this->getPaymentMethod()->getNumber());
-		
-		$expireMonth = $this->getPaymentMethod->getExpireMonth();
-		$expireYear  = $this->getPaymentMethod->getExpireYear();		
-
-		if (1 == strlen($expireMonth)) {
-			$expireMonth .= "0".$expireMonth;
-		}
-		if (strlen($expireYear) > 2) {
-			$expireYear = substr($expireYear, (strlen($expireYear) - 2)); 
-		}
-		$expDate = $expireMonth.$expireYear;
-		$postString .= static::encodeKeyVal(static::CC_EXP_DATE, $expireDate);
-
 		if (null === $this->getAddress())
 		{
 			throw new \Exception('Billing Address is Required');
@@ -286,32 +231,96 @@ class PaymentGateway extends AbstractPaymentGateway
 		{
 			throw new \Exception('Postal Code is Required');
 		}
-		$postString .= static::encodeKeyVal(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
-		$postString .= static::encodeKeyVal(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
-		$postString .= static::encodeKeyVal(static::ADDRESS_KEY, $this->getAddress()->getStreet1());
-		$postString .= static::encodeKeyVal(static::STATE_KEY, $this->getAddress()->getState());
-		$postString .= static::encodeKeyVal(static::ZIP_KEY, $this->getAddress()->getPostalCode());
+		$postString = '';
+		$postString .= $this->encodeKeyVal(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
+		$postString .= $this->encodeKeyVal(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
+		$postString .= $this->encodeKeyVal(static::ADDRESS_KEY, $this->getAddress()->getStreet1());
+		$postString .= $this->encodeKeyVal(static::STATE_KEY, $this->getAddress()->getState());
+		$postString .= $this->encodeKeyVal(static::ZIP_KEY, $this->getAddress()->getPostalCode());
 		return $postString;	
 	}
 
-	public function getPostStringForAuthorize()
+	protected function createAmountPostString()
 	{
-		$postString = '';
-		$postString .= $this->getPostStringRequirements();
-		$postString .= static::encodeKeyVal(static::TYPE_KEY, static::TYPE_AUTH_VAL);
-		$postString .= $this->getPostStringDepsForAuthorizeAndCapture();
-
+		$postString = '';		
+		if (null === $this->getAmount()) {
+			throw new \Exception('Amount Required');
+		}
+		$postString .= $this->encodeKeyVal(static::AMOUNT_KEY, $this->getAmount());
 		return $postString;
 	}
 
-	public function getPostStringForCapture()
+	protected function createConnectionPostString()
 	{
-		$postString = '';
-		$postString .= $this->getPostStringRequirements();
-		$postString .= static::encodeKeyVal(static::TYPE_KEY, static::TYPE_CAPTURE_VAL);
-		$postString .= $this->getPostStringDepsForAuthorizeAndCapture();
-
+		if (null === $this->getApiLoginId()) {
+			throw new \Exception('API Login ID Required');
+		}
+		if (null === $this->getTransactionKey()) {
+			throw new \Exception('Transaction Key Required');
+		}
+		if (null === $this->getVersion()) {
+			throw new \Exception('Version Required');
+		}
+		if (null === $this->getDelimData()) {
+			throw new \Exception('Data Delimiter Required');
+		}
+		if (null === $this->getDelimChar()) {
+			throw new \Exception('Character Delimiter Required');
+		}
+		if (null === $this->getRelayResponse()) {
+			throw new \Exception('Relay Response type Required');
+		}
+		if (null === $this->getDescription()) {
+			throw new \Exception('Description Required');
+		}
+		$postString = '';		
+		$postString .= $this->encodeKeyVal(static::API_LOGIN_ID_KEY, $this->getApiLoginId());
+		$postString .= $this->encodeKeyVal(static::TRANSACTION_KEY, $this->getTransactionKey());		
+		$postString .= $this->encodeKeyVal(static::VERSION_KEY, $this->getVersion());		
+		$postString .= $this->encodeKeyVal(static::DELIM_DATA_KEY, $this->getDelimData();		
+		$postString .= $this->encodeKeyVal(static::DELIM_CHAR_KEY, $this->getDelimChar());				
+		$postString .= $this->encodeKeyVal(static::RELAY_RESPONSE_KEY, $this->getRelayResponse());
+		$postString .= $this->encodeKeyVal(static::DESC_KEY, $this->getDescription());		
 		return $postString;
+	}
+
+	protected function createPaymentMethodPostString()
+	{
+		if (null === $this->getPaymentMethod())
+		{
+			throw new \Exception('Payment Method Required');
+		}
+		if (null === $this->getPaymentMethod()->getNumber())
+		{
+			throw new \Exception('Payment Method Number Required');
+		}
+		if (null === $this->getPaymentMethod()->getExp$postString = '';
+		$postString .= $this->createConnectionPostString();
+		$postString .= $this->createAmountPostString();
+		$postString .= $this->createAmountPostString();ireMonth())
+		{
+			throw new \Exception('Credit Card Expiration Month Required');
+		}
+		if (null === $this->getPaymentMethod()->getExpireYear())
+		{
+			throw new \Exception('Credit Card Expiration Year Required');
+		}
+		$postString = '';		
+		$postString .= $this->encodeKeyVal(static::METHOD_KEY, static::METHOD_CC_VAL);		
+		$postString .= $this->encodeKeyVal(static::CC_NUM_KEY, $this->getPaymentMethod()->getNumber());
+		
+		$expireMonth = $this->getPaymentMethod->getExpireMonth();
+		$expireYear  = $this->getPaymentMethod->getExpireYear();		
+
+		if (1 == strlen($expireMonth)) {
+			$expireMonth .= "0".$expireMonth;
+		}
+		if (strlen($expireYear) > 2) {
+			$expireYear = substr($expireYear, (strlen($expireYear) - 2)); 
+		}
+		$expDate = $expireMonth.$expireYear;
+		$postString .= $this->encodeKeyVal(static::CC_EXP_DATE, $expireDate);
+		return $postString;	
 	}
 
 	public function setPostUrl($postUrl)
