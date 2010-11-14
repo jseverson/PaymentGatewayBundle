@@ -10,26 +10,26 @@ class PaymentGateway extends AbstractPaymentGateway
 	CONST AMOUNT_KEY         = "x_amount";
 	CONST API_LOGIN_ID_KEY   = "x_login";
 	CONST CC_NUM_KEY         = "x_card_num";
-	CONST CC_EXP_DATE        = "x_exp_date";	
+	CONST CC_EXP_DATE        = "x_exp_date";
 	CONST DELIM_DATA_KEY     = "x_delim_data";
 	CONST DELIM_CHAR_KEY     = "x_delim_char";
 	CONST DESC_KEY           = "x_description";
 	CONST FIRST_NAME_KEY     = "x_first_name";
 	CONST LAST_NAME_KEY      = "x_last_name";
 	CONST METHOD_KEY         = "x_method";
-	CONST METHOD_CC_VAL      = "CC";	
+	CONST METHOD_CC_VAL      = "CC";
 	CONST RELAY_RESPONSE_KEY = "x_relay_response";
 	CONST STATE_KEY          = "x_state";
 	CONST TRANSACTION_KEY    = "x_tran_key";
 	CONST TYPE_KEY           = "x_type";
-	CONST TYPE_AUTH_VAL      = "AUTH_ONLY";	
+	CONST TYPE_AUTH_VAL      = "AUTH_ONLY";
 	CONST TYPE_CAPTURE_VAL   = "AUTH_CAPTURE";
 	CONST VERSION_KEY        = "x_version";
 	CONST ZIP_KEY            = "x_zip";
 
 	private $address;
 	private $amount;
-	private $order;	
+	private $order;
 	private $paymentMethod;
 	private $postFields = array();
 	
@@ -97,7 +97,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->addAddressToPost();
 		$postFields = $this->createEncodedPostFields();
 
-		$this->connect();		
+		$this->connect();
 		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postFields);
 		$this->disconnect();
 	}
@@ -117,7 +117,7 @@ class PaymentGateway extends AbstractPaymentGateway
 
 	public function createEncodedPostFields()
 	{
-		$out = '';		
+		$out = '';
 		foreach ($this->postFields as $key => $val)
 		{
 			$out .= $key. '=' .  .urlencode($val) . "&";
@@ -245,7 +245,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		{
 			throw new \Exception('Last Name is Required');
 		}
-		if (null === $this->getAddress()->getStreet1())
+		if (null === $this->getAddress()->getStreet())
 		{
 			throw new \Exception('Street Address is Required');
 		}
@@ -259,13 +259,13 @@ class PaymentGateway extends AbstractPaymentGateway
 		}
 		$this->addPostField(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
 		$this->addPostField(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
-		$this->addPostField(static::ADDRESS_KEY, $this->getAddress()->getStreet1());
+		$this->addPostField(static::ADDRESS_KEY, $this->getAddress()->getStreet());
 		$this->addPostField(static::STATE_KEY, $this->getAddress()->getState());
 		$this->addPostField(static::ZIP_KEY, $this->getAddress()->getPostalCode());
 	}
 
 	protected function addAmountToPost()
-	{		
+	{
 		if (null === $this->getAmount()) {
 			throw new \Exception('Amount Required');
 		}
@@ -295,7 +295,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		}
 		if (null === $this->getDescription()) {
 			throw new \Exception('Description Required');
-		}	
+		}
 		$this->addPostField(static::API_LOGIN_ID_KEY, $this->getApiLoginId());
 		$this->addPostField(static::TRANSACTION_KEY, $this->getTransactionKey());		
 		$this->addPostField(static::VERSION_KEY, $this->getVersion());		
@@ -322,12 +322,12 @@ class PaymentGateway extends AbstractPaymentGateway
 		if (null === $this->getPaymentMethod()->getExpireYear())
 		{
 			throw new \Exception('Credit Card Expiration Year Required');
-		}	
-		$this->addPostField(static::METHOD_KEY, static::METHOD_CC_VAL);		
+		}
+		$this->addPostField(static::METHOD_KEY, static::METHOD_CC_VAL);
 		$this->addPostField(static::CC_NUM_KEY, $this->getPaymentMethod()->getNumber());
-		
+
 		$expireMonth = $this->getPaymentMethod->getExpireMonth();
-		$expireYear  = $this->getPaymentMethod->getExpireYear();		
+		$expireYear  = $this->getPaymentMethod->getExpireYear();
 
 		if (1 == strlen($expireMonth)) {
 			$expireMonth .= "0".$expireMonth;

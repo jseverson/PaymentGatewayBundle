@@ -6,7 +6,7 @@ interface AddressInterface
 {
 	public function getFirstName();
 	public function getLastName();
-	public function getStreet1();
+	public function getStreet();
 	public function getState();
 	public function getPostalCode();
 }
