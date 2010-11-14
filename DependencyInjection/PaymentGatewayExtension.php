@@ -45,7 +45,7 @@ class PaymentGatewayExtension extends Extension
 	 */
 	public function getNamespace()
 	{
-		return 'http://www.symfony-project.org/schema/dic/payment_gateway'
+		return 'http://www.symfony-project.org/schema/dic/payment_gateway';
 	}
 
 	/**
