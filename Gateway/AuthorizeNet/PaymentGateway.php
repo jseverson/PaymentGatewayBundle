@@ -29,9 +29,13 @@ class PaymentGateway extends AbstractPaymentGateway
 
 	protected $address;
 	protected $amount;
+	protected $curl;
+	protected $errors = array();
 	protected $order;
 	protected $paymentMethod;
 	protected $postFields = array();
+	protected $rawResponse;
+	protected $response;
 
 	protected $config = array(
 		"version"             => "3.1",
@@ -44,9 +48,6 @@ class PaymentGateway extends AbstractPaymentGateway
 		"description"         => "Sample Transaction",
 	);
 
-	private $curl;
-	private $response;
-	
 	public function __construct(array $config = array())
 	{
 		$this->config = array_merge($this->config, $config);
@@ -86,7 +87,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->connect();
 		curl_setopt($this->getCurl(), \CURLOPT_POSTFIELDS, $postFields);	
 		$this->curlExec();
-		$this->hasResponseErrors();
+		$this->processResponse();
 		$this->disconnect();
 	}
 
@@ -102,7 +103,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->connect();
 		curl_setopt($this->getCurl(), \CURLOPT_POSTFIELDS, $postFields);
 		$this->curlExec();
-		$this->hasResponseErrors();
+		$this->processResponse();
 		$this->disconnect();
 	}
 
@@ -113,10 +114,36 @@ class PaymentGateway extends AbstractPaymentGateway
 	{
 
 	}
-	
+
+	public function setErrors(array $errors = array())
+	{
+		$this->errors = $errors;
+	}
+
+	public function getErrors()
+	{
+		return $this->errors;
+	}
+
+	public function hasErrors()
+	{
+		return !empty($this->errors);
+	}
+
+	public function getErrorMessage()
+	{
+		$out = '';
+		foreach ($this->errors as $error)
+		{
+			$out .= $error.', ';
+		}
+		$out = rtrim( $out, ", " );
+		return $out;
+	}
+
 	private function curlExec()
 	{
-		$this->response = curl_exec($this->getCurl());
+		$this->rawResponse = curl_exec($this->getCurl());
 	}
 
 	public function createEncodedPostFields()
@@ -379,6 +406,11 @@ class PaymentGateway extends AbstractPaymentGateway
 		}
 	}
 
+	public function getRawResponse()
+	{
+		return $this->rawResponse;
+	}
+
 	public function getRelayResponse()
 	{
 		if (array_key_exists('relayResponse', $this->config))
@@ -397,15 +429,18 @@ class PaymentGateway extends AbstractPaymentGateway
 		return $this->response;
 	}
 
-	public function hasResponseErrors()
+	public function processResponse()
 	{
-		if ($this->response)
+		if ($this->rawResponse)
 		{
-			$response = explode($this->getDelimChar(), $this->response);
-			print_r("<pre>");
-			print_r($response);
-			print_r("</pre>");
-			die();
+			$this->response = new Response();
+			$this->response->setDelimChar($this->getDelimChar());
+			$this->response->setRawData($this->rawResponse);
+			$this->response->process();
+			if ($this->response->hasErrors())
+			{
+				$this->setErrors($this->response->getErrors());
+			}
 		}
 	}
 
