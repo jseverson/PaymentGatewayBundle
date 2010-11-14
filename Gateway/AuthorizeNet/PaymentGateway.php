@@ -76,8 +76,6 @@ class PaymentGateway extends AbstractPaymentGateway
 
 	public function authorize()
 	{
-		$this->connect();
-
 		$this->addPostField(static::TYPE_KEY, static::TYPE_AUTH_VAL);
 		$this->addConnectionToPost();
 		$this->addAmountToPost();
@@ -85,15 +83,13 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->addAddressToPost();
 		$postFields = $this->createEncodedPostFields();
 
-		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postFields);
-	
+		$this->connect();
+		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postFields);	
 		$this->disconnect();
 	}
 
 	public function capture()
-	{
-		$this->connect();
-		
+	{	
 		$this->addPostField(static::TYPE_KEY, static::TYPE_CAPTURE_VAL);
 		$this->addConnectionToPost();
 		$this->addAmountToPost();
@@ -101,8 +97,8 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->addAddressToPost();
 		$postFields = $this->createEncodedPostFields();
 
+		$this->connect();		
 		curl_setopt($this->curl, \CURLOPT_POSTFIELDS, $postFields);
-
 		$this->disconnect();
 	}
 
