@@ -28,7 +28,7 @@ class Response
 	const INDEX_RESPONSE_REASON_TEXT = 3;
 	const INDEX_AVS_RESPONSE         = 5;
 	const INDEX_TRANSACTION_ID       = 6;
-	const INDEX_TRANSACTION_TYPE     = 12;
+	const INDEX_TRANSACTION_TYPE     = 11;
 	const INDEX_PURCHASE_ORDER_NUM   = 36;
 	const INDEX_CCV_CODE             = 38;
 	const INDEX_CARD_TYPE            = 51;
