@@ -196,8 +196,8 @@ class Response
 
 	public function getResponseCodeText()
 	{
-		$code = $this->getReponseCode();
-		if (isset($code) && isset(static::$responeCodeChoices[$code]))
+		$code = $this->getResponseCode();
+		if (isset($code) && isset(static::$responseCodeChoices[$code]))
 		{
 			return static::$responseCodeChoices[$code];
 		}

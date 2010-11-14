@@ -18,6 +18,7 @@ class PaymentGateway extends AbstractPaymentGateway
 	CONST LAST_NAME_KEY      = "x_last_name";
 	CONST METHOD_KEY         = "x_method";
 	CONST METHOD_CC_VAL      = "CC";
+	CONST PURCHASE_ORDER_KEY  = "x_po_num";
 	CONST RELAY_RESPONSE_KEY = "x_relay_response";
 	CONST STATE_KEY          = "x_state";
 	CONST TRANSACTION_KEY    = "x_tran_key";
@@ -82,6 +83,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->addAmountToPost();
 		$this->addPaymentMethodToPost();
 		$this->addAddressToPost();
+		$this->addOrderToPost();
 		$postFields = $this->createEncodedPostFields();
 
 		$this->connect();
@@ -98,6 +100,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->addAmountToPost();
 		$this->addPaymentMethodToPost();
 		$this->addAddressToPost();
+		$this->addOrderToPost();
 		$postFields = $this->createEncodedPostFields();
 
 		$this->connect();
@@ -356,7 +359,20 @@ class PaymentGateway extends AbstractPaymentGateway
 		$this->addPostField(static::DELIM_DATA_KEY, $this->getDelimData());
 		$this->addPostField(static::DELIM_CHAR_KEY, $this->getDelimChar());
 		$this->addPostField(static::RELAY_RESPONSE_KEY, $this->getRelayResponse());
-		$this->addPostField(static::DESC_KEY, $this->getDescription());	
+		$this->addPostField(static::DESC_KEY, $this->getDescription());
+	}
+
+	protected function addOrderToPost()
+	{
+		if (null === $this->getOrder())
+		{
+			throw new \Exception('Order Required');
+		}
+		if (null === $this->getOrder()->getNumber())
+		{
+			throw new \Exception('Order Number Required');
+		}
+		$this->addPostField(static::PURCHASE_ORDER_KEY, $this->getOrder()->getNumber());
 	}
 
 	protected function addPaymentMethodToPost()
