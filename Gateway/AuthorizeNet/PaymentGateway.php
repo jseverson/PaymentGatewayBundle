@@ -120,7 +120,7 @@ class PaymentGateway extends AbstractPaymentGateway
 		$out = '';
 		foreach ($this->postFields as $key => $val)
 		{
-			$out .= $key. '=' .  .urlencode($val) . "&";
+			$out .= $key. '=' . urlencode($val) . "&";
 		}
 		$out = rtrim( $out, "& " );
 		return $out;
@@ -297,10 +297,10 @@ class PaymentGateway extends AbstractPaymentGateway
 			throw new \Exception('Description Required');
 		}
 		$this->addPostField(static::API_LOGIN_ID_KEY, $this->getApiLoginId());
-		$this->addPostField(static::TRANSACTION_KEY, $this->getTransactionKey());		
-		$this->addPostField(static::VERSION_KEY, $this->getVersion());		
-		$this->addPostField(static::DELIM_DATA_KEY, $this->getDelimData();		
-		$this->addPostField(static::DELIM_CHAR_KEY, $this->getDelimChar());				
+		$this->addPostField(static::TRANSACTION_KEY, $this->getTransactionKey());
+		$this->addPostField(static::VERSION_KEY, $this->getVersion());
+		$this->addPostField(static::DELIM_DATA_KEY, $this->getDelimData());
+		$this->addPostField(static::DELIM_CHAR_KEY, $this->getDelimChar());
 		$this->addPostField(static::RELAY_RESPONSE_KEY, $this->getRelayResponse());
 		$this->addPostField(static::DESC_KEY, $this->getDescription());	
 	}
