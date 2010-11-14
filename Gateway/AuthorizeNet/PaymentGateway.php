@@ -63,9 +63,9 @@ class PaymentGateway extends AbstractPaymentGateway
 		if (null === $this->getCurlOptSslVerifyPeer()) {
 			throw new \Exception('CURL SSL Verify Peer Setting Required');
 		}
-		curl_setopt($this->curl, \CURLOPT_HEADER, $this->getCurlOptHeader());
-		curl_setopt($this->curl, \CURLOPT_RETURNTRANSFER, $this->getCurlOptReturnTransfer());
-		curl_setopt($this->curl, \CURLOPT_SSL_VERIFYPEER, $this->getCurlOptSslVerifyPeer());
+		curl_setopt($this->getCurl(), \CURLOPT_HEADER, $this->getCurlOptHeader());
+		curl_setopt($this->getCurl(), \CURLOPT_RETURNTRANSFER, $this->getCurlOptReturnTransfer());
+		curl_setopt($this->getCurl(), \CURLOPT_SSL_VERIFYPEER, $this->getCurlOptSslVerifyPeer());
 	}
 
 
@@ -89,7 +89,7 @@ class PaymentGateway extends AbstractPaymentGateway
 	}
 
 	public function capture()
-	{	
+	{
 		$this->addPostField(static::TYPE_KEY, static::TYPE_CAPTURE_VAL);
 		$this->addConnectionToPost();
 		$this->addAmountToPost();
@@ -146,10 +146,10 @@ class PaymentGateway extends AbstractPaymentGateway
 
 	public function setCurl($curl = null)
 	{
-		if ($culr)
+		if ($curl)
 		{
 			$this->curl = $culr;
-		} 
+		}
 		else
 		{
 			$this->curl = curl_init($this->getPostUrl());
@@ -158,6 +158,10 @@ class PaymentGateway extends AbstractPaymentGateway
 
 	public function getCurl()
 	{
+		if (!$this->curl)
+		{
+			$this->setCurl();
+		}
 		return $this->curl;
 	}
 
