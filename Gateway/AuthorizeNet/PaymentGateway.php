@@ -2,7 +2,7 @@
 
 namespace Bundle\PaymentGatewayBundle\Gateway\AuthorizeNet;
 
-use Bundle\PaymentGatewayBundle\Gateway\PaymentGateway as AbstractPaymentGateway;
+use Bundle\PaymentGatewayBundle\Gateway\AbstractPaymentGateway;
 
 class PaymentGateway extends AbstractPaymentGateway
 {

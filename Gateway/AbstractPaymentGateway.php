@@ -5,7 +5,7 @@ namespace Bundle\PaymentGatewayBundle\Gateway;
 use Bundle\PaymentGatewayBundle\Transaction\AddressInterface;
 use Bundle\PaymentGatewayBundle\Transaction\OrderInterface;
 
-abstract class PaymentGateway implements PaymentGatewayInterface
+abstract class AbstractPaymentGateway implements PaymentGatewayInterface
 {
 	protected $address;
 	protected $amount;
