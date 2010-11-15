@@ -2,12 +2,14 @@
 
 namespace Bundle\PaymentGatewayBundle\Gateway;
 
-abstract class AbstractPaymentGatewayFactory
+abstract class AbstractPaymentGatewayFactory implements PaymentGatewayFactoryInterface
 {
 	protected $config = array();
 	protected $gateways = array();
 
-	abstract public function createGateway($key);
+	public function createGateway($key) {
+
+	}
 
 	public function setConfig(array $config = array())
 	{
