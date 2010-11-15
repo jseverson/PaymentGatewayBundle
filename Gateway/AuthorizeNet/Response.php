@@ -48,10 +48,10 @@ class Response
 	);
 
 	static protected $responseCodeChoices = array(
-		self::RESPONSE_CODE_APPROVED => 'Approved',
-		self::RESPONSE_CODE_DECLINED => 'Declined',
-		self::RESPONSE_CODE_ERROR    => 'Error',
-		self::RESPONSE_CODE_HELD     => 'Held for Review',
+		self::RESPONSE_CODE_APPROVED => 'approved',
+		self::RESPONSE_CODE_DECLINED => 'declined',
+		self::RESPONSE_CODE_ERROR    => 'error',
+		self::RESPONSE_CODE_HELD     => 'held for review',
 	);
 
 	static protected $avsChoices = array(
