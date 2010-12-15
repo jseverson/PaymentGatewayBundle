@@ -12,31 +12,6 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
 	protected $order;
 	protected $paymentMethod;
 
-	public function connect()
-	{
-	
-	}
-
-	public function disconnect()
-	{
-
-	}
-
-	public function authorize()
-	{
-
-	}
-
-	public function capture()
-	{
-
-	}
-	
-	public function cancel()
-	{
-
-	}
-
 	public function setAddress(AddressInterface $address)
 	{
 		$this->address = $address;
