@@ -13,7 +13,7 @@ class PaymentGatewayExtension extends Extension
 		'authorizenet'   => 'authorizenet.xml',
 	);
 
-	public function authorizenetLoad($config, ContainerBuilder $container)
+	public function load(array $config, ContainerBuilder $container)
 	{
 		if (!$container->hasDefinition('payment_gateway.authorizenet'))
 		{
