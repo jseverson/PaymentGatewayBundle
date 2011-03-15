@@ -7,48 +7,48 @@ use Bundle\PaymentGatewayBundle\Transaction\OrderInterface;
 
 abstract class AbstractPaymentGateway implements PaymentGatewayInterface
 {
-	protected $address;
-	protected $amount;
-	protected $order;
-	protected $paymentMethod;
+    protected $address;
+    protected $amount;
+    protected $order;
+    protected $paymentMethod;
 
-	public function setAddress(AddressInterface $address)
-	{
-		$this->address = $address;
-	}
+    public function setAddress(AddressInterface $address)
+    {
+        $this->address = $address;
+    }
 
-	public function getAddress()
-	{
-		return $this->address;
-	}
+    public function getAddress()
+    {
+        return $this->address;
+    }
 
-	public function setAmount($amount)
-	{
-		$this->amount = $amount;
-	}
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
+    }
 
-	public function getAmount()
-	{
-		return $this->amount;
-	}
+    public function getAmount()
+    {
+        return $this->amount;
+    }
 
-	public function setPaymentMethod($method)
-	{
-		$this->paymentMethod = $method;
-	}
+    public function setPaymentMethod($method)
+    {
+        $this->paymentMethod = $method;
+    }
 
-	public function getPaymentMethod()
-	{
-		return $this->paymentMethod;
-	}
+    public function getPaymentMethod()
+    {
+        return $this->paymentMethod;
+    }
 
-	public function setOrder(OrderInterface $order)
-	{
-		$this->order = $order;
-	}
+    public function setOrder(OrderInterface $order)
+    {
+        $this->order = $order;
+    }
 
-	public function getOrder()
-	{
-		return $this->order;
-	}
+    public function getOrder()
+    {
+        return $this->order;
+    }
 }

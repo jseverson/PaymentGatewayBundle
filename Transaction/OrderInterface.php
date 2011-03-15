@@ -4,5 +4,5 @@ namespace Bundle\PaymentGatewayBundle\Transaction;
 
 interface OrderInterface
 {
-	public function getNumber();
+    public function getNumber();
 }
