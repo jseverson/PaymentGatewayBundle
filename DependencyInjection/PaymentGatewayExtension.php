@@ -15,6 +15,12 @@ class PaymentGatewayExtension extends Extension
 
     public function load(array $config, ContainerBuilder $container)
     {
+
+        if(isset($config[0]))
+        {
+            $config = $config[0];
+        }
+
         if (!$container->hasDefinition('payment_gateway.authorizenet'))
         {
             $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
