@@ -7,9 +7,7 @@ abstract class AbstractPaymentGatewayFactory implements PaymentGatewayFactoryInt
     protected $config = array();
     protected $gateways = array();
 
-    public function createGateway($key) {
-
-    }
+    abstract public function createGateway($key);
 
     public function setConfig(array $config = array())
     {
@@ -33,11 +31,7 @@ abstract class AbstractPaymentGatewayFactory implements PaymentGatewayFactoryInt
 
     public function get($key)
     {
-        if (!array_key_exists($key, $this->gateways))
-        {
-            $this->gateways[$key] = $this->createGateway($key);
-        }
-        return $this->gateways[$key];
+        return $this->createGateway($key);
     }
 
 }

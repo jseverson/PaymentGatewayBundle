@@ -2,6 +2,7 @@
 
 namespace Bundle\PaymentGatewayBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,18 +14,46 @@ class PaymentGatewayExtension extends Extension
         'authorizenet'   => 'authorizenet.xml',
     );
 
-    public function load(array $config, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('payment_gateway.authorizenet'))
-        {
-            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-            $loader->load($this->resources['authorizenet']);
+        $configuration = new Configuration();
+        $processor = new Processor();
+        $config = $processor->process($configuration->getConfigTree(), $configs);
+
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('authorizenet.xml');
+
+        if (empty($config['gateways'])) {
+            throw new InvalidArgumentException('You must define at least one payment gateway');
         }
-        if (isset($config['config']))
-        {
-            $container->setParameter('payment_gateway.authorizenet.config', $config['config']);
+
+        if (empty($config['default_gateway'])) {
+            $keys = array_keys($config['gateways']);
+            $config['default_gateway'] = reset($keys);
         }
-        return $container;
+
+        $clientIdsByName = $this->loadClients($config['clients'], $container);
+
+        $container->setAlias('payment_gateway.client', sprintf('foq_elastica.client.%s', $config['default_client']));
+    }
+
+    /**
+     * Loads the configured clients.
+     *
+     * @param array $config An array of clients configurations
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function loadClients(array $clients, ContainerBuilder $container)
+    {
+        $clientIds = array();
+        foreach ($clients as $name => $clientConfig) {
+            $clientDef = new Definition('%foq_elastica.client.class%', array($clientConfig));
+            $clientId = sprintf('foq_elastica.client.%s', $name);
+            $container->setDefinition($clientId, $clientDef);
+            $clientIds[$name] = $clientId;
+        }
+
+        return $clientIds;
     }
 
     /**
@@ -39,23 +68,4 @@ class PaymentGatewayExtension extends Extension
         return 'payment_gateway';
     }
 
-    /**
-     * Returns the namespace to be used for this extension (XML namespace).
-     *
-     * @return string The XML namespace
-     */
-    public function getNamespace()
-    {
-        return 'http://symfony.com/schema/dic/payment_gateway';
-    }
-
-    /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
-     */
-    public function getXsdValidationBasePath()
-    {
-        return __DIR__.'/../Resources/config/';
-    }
 }
