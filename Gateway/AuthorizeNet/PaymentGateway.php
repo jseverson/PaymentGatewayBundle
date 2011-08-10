@@ -84,7 +84,7 @@ class PaymentGateway extends AbstractPaymentGateway
         $this->addAmountToPost();
         $this->addPaymentMethodToPost();
         $this->addAddressToPost();
-        $this->addOrderToPost();
+        //$this->addOrderToPost();
         $postFields = $this->createEncodedPostFields();
 
         $this->connect();

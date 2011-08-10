@@ -7,31 +7,9 @@ abstract class AbstractPaymentGatewayFactory implements PaymentGatewayFactoryInt
     protected $config = array();
     protected $gateways = array();
 
-    abstract public function createGateway($key);
-
-    public function setConfig(array $config = array())
+    public function __construct(array $config)
     {
         $this->config = $config;
-    }
-
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    public function setGateways(array $gateways = array())
-    {
-        $this->gateways = $gateways;
-    }
-
-    public function getGateways()
-    {
-        return $this->gateways;
-    }
-
-    public function get($key)
-    {
-        return $this->createGateway($key);
     }
 
 }

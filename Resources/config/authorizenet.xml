@@ -4,9 +4,7 @@
 
     <services>
         <service id="payment_gateway.authorizenet_gateway_factory" class="Bundle\PaymentGatewayBundle\Gateway\AuthorizeNet\PaymentGatewayFactory">
-            <call method="setConfig">
-                <argument>%payment_gateway.authorizenet.config%</argument>
-            </call>
+            <argument>%payment_gateway.authorizenet.config%</argument>
         </service>
     </services>
 
