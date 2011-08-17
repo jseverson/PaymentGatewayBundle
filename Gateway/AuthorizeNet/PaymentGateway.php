@@ -292,35 +292,21 @@ class PaymentGateway extends AbstractPaymentGateway
 
     protected function addAddressToPost()
     {
-        if (null === $this->getAddress())
-        {
-            throw new \Exception('Billing Address is Required');
+        if($this->getAddress()->getFirstName()) {
+            $this->addPostField(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
         }
-        if (null === $this->getAddress()->getFirstName())
-        {
-            throw new \Exception('First Name is Required');
+        if($this->getAddress()->getLastName()) {
+            $this->addPostField(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
         }
-        if (null === $this->getAddress()->getLastName())
-        {
-            throw new \Exception('Last Name is Required');
+        if($this->getAddress()->getStreet()) {
+            $this->addPostField(static::ADDRESS_KEY, $this->getAddress()->getStreet());
         }
-        if (null === $this->getAddress()->getStreet())
-        {
-            throw new \Exception('Street Address is Required');
+        if($this->getAddress()->getState()) {
+            $this->addPostField(static::STATE_KEY, $this->getAddress()->getState());
         }
-        if (null === $this->getAddress()->getState())
-        {
-            throw new \Exception('State is Required');
+        if($this->getAddress()->getPostalCode()) {
+            $this->addPostField(static::ZIP_KEY, $this->getAddress()->getPostalCode());
         }
-        if (null === $this->getAddress()->getPostalCode())
-        {
-            throw new \Exception('Postal Code is Required');
-        }
-        $this->addPostField(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
-        $this->addPostField(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
-        $this->addPostField(static::ADDRESS_KEY, $this->getAddress()->getStreet());
-        $this->addPostField(static::STATE_KEY, $this->getAddress()->getState());
-        $this->addPostField(static::ZIP_KEY, $this->getAddress()->getPostalCode());
         if($this->getAddress()->getEmail()) {
             $this->addPostField(static::EMAIL_KEY, $this->getAddress()->getEmail());
         }
