@@ -292,23 +292,25 @@ class PaymentGateway extends AbstractPaymentGateway
 
     protected function addAddressToPost()
     {
-        if($this->getAddress()->getFirstName()) {
-            $this->addPostField(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
-        }
-        if($this->getAddress()->getLastName()) {
-            $this->addPostField(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
-        }
-        if($this->getAddress()->getStreet()) {
-            $this->addPostField(static::ADDRESS_KEY, $this->getAddress()->getStreet());
-        }
-        if($this->getAddress()->getState()) {
-            $this->addPostField(static::STATE_KEY, $this->getAddress()->getState());
-        }
-        if($this->getAddress()->getPostalCode()) {
-            $this->addPostField(static::ZIP_KEY, $this->getAddress()->getPostalCode());
-        }
-        if($this->getAddress()->getEmail()) {
-            $this->addPostField(static::EMAIL_KEY, $this->getAddress()->getEmail());
+        if(null !== $this->getAddress()) {
+            if($this->getAddress()->getFirstName()) {
+                $this->addPostField(static::FIRST_NAME_KEY, $this->getAddress()->getFirstName());
+            }
+            if($this->getAddress()->getLastName()) {
+                $this->addPostField(static::LAST_NAME_KEY, $this->getAddress()->getLastName());
+            }
+            if($this->getAddress()->getStreet()) {
+                $this->addPostField(static::ADDRESS_KEY, $this->getAddress()->getStreet());
+            }
+            if($this->getAddress()->getState()) {
+                $this->addPostField(static::STATE_KEY, $this->getAddress()->getState());
+            }
+            if($this->getAddress()->getPostalCode()) {
+                $this->addPostField(static::ZIP_KEY, $this->getAddress()->getPostalCode());
+            }
+            if($this->getAddress()->getEmail()) {
+                $this->addPostField(static::EMAIL_KEY, $this->getAddress()->getEmail());
+            }
         }
     }
 
