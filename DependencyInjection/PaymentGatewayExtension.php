@@ -16,6 +16,8 @@ class PaymentGatewayExtension extends Extension
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('authorizenet.xml');
+        $loader->load('logger.xml');
+        $loader->load('logs_warmer.xml');
 
         $container->setParameter('payment_gateway.authorizenet.config', $config);
     }

@@ -2,6 +2,7 @@
 
 namespace Bundle\PaymentGatewayBundle\Gateway\AuthorizeNet;
 
+use Bundle\PaymentGatewayBundle\PaymentLogger;
 use Bundle\PaymentGatewayBundle\Gateway\AbstractPaymentGateway;
 
 class PaymentGateway extends AbstractPaymentGateway
@@ -38,6 +39,7 @@ class PaymentGateway extends AbstractPaymentGateway
     protected $postFields = array();
     protected $rawResponse;
     protected $response;
+    protected $logger;
 
     protected $config = array(
         "version"             => "3.1",
@@ -50,8 +52,9 @@ class PaymentGateway extends AbstractPaymentGateway
         "description"         => "Sample Transaction",
     );
 
-    public function __construct(array $config = array())
+    public function __construct(PaymentLogger $logger, array $config = array())
     {
+        $this->logger = $logger;
         $this->config = array_merge($this->config, $config);
     }
 
@@ -87,6 +90,8 @@ class PaymentGateway extends AbstractPaymentGateway
         //$this->addOrderToPost();
         $postFields = $this->createEncodedPostFields();
 
+        $message = $this->prepareLogMessage($postFields);
+        $this->logger->log($message);
         $this->connect();
         curl_setopt($this->getCurl(), \CURLOPT_POSTFIELDS, $postFields);
         $this->curlExec();
@@ -104,6 +109,8 @@ class PaymentGateway extends AbstractPaymentGateway
         $this->addOrderToPost();
         $postFields = $this->createEncodedPostFields();
 
+        $message = $this->prepareLogMessage($postFields);
+        $this->logger->log($message);
         $this->connect();
         curl_setopt($this->getCurl(), \CURLOPT_POSTFIELDS, $postFields);
         $this->curlExec();
@@ -479,4 +486,16 @@ class PaymentGateway extends AbstractPaymentGateway
         return $this->config['version'] = (string) $version;
     }
 
+    protected function prepareLogMessage($rawMessage)
+    {
+        $message = $rawMessage;
+        preg_match('/x_card_num=\d+/', $rawMessage, $cards);
+        if (count($cards) > 0) {
+            $creditCardNumberArray = explode('=', $cards[0]);
+            $creditCardNumber = str_pad(substr($creditCardNumberArray[1],-4), strlen($creditCardNumberArray[1]), '*', STR_PAD_LEFT);
+            $message = str_replace('x_card_num=' . $creditCardNumberArray[1], 'x_card_num=' . $creditCardNumber, $message);
+        }
+
+        return $message;
+    }
 }

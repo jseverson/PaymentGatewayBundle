@@ -8,6 +8,6 @@ class PaymentGatewayFactory extends AbstractPaymentGatewayFactory
 {
     public function create()
     {
-        return new PaymentGateway($this->config);
+        return new PaymentGateway($this->paymentLogger, $this->config);
     }
 }
