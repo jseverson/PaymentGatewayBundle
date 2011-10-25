@@ -9,15 +9,13 @@ Sign up for a test account to get your test API Login ID and Transaction Key
 ### config.yml
 
     payment_gateway.authorizenet:
-      config:
-        default:
-          apiLoginId: xxxxxxxx
-          transactionKey: xxxxxxxx
-          postUrl: https://test.authorize.net/gateway/transact.dll
+        apiLoginId: xxxxxxxx
+        transactionKey: xxxxxxxx
+        postUrl: https://test.authorize.net/gateway/transact.dll
 
 ### Instantiate
 
-    $gateway = $this->container->get('payment_gateway.authorizenet')->get('default');
+    $gateway = $this->container->get('payment_gateway.authorizenet.config');
 
 ### Set Requirements
 
