@@ -91,7 +91,10 @@ class PaymentGateway extends AbstractPaymentGateway
         $postFields = $this->createEncodedPostFields();
 
         $message = $this->prepareLogMessage($postFields);
-        $this->logger->log($message);
+        try {
+            $this->logger->log($message);
+        } catch (\Exception $e) {
+        }
         $this->connect();
         curl_setopt($this->getCurl(), \CURLOPT_POSTFIELDS, $postFields);
         $this->curlExec();
@@ -110,7 +113,10 @@ class PaymentGateway extends AbstractPaymentGateway
         $postFields = $this->createEncodedPostFields();
 
         $message = $this->prepareLogMessage($postFields);
-        $this->logger->log($message);
+        try {
+            $this->logger->log($message);
+        } catch (\Exception $e) {
+        }
         $this->connect();
         curl_setopt($this->getCurl(), \CURLOPT_POSTFIELDS, $postFields);
         $this->curlExec();
