@@ -2,7 +2,7 @@
 
 namespace Bundle\PaymentGatewayBundle\Gateway;
 
-use Bundle\PaymentGatewayBundle\PaymentLogger;
+use Bundle\PaymentGatewayBundle\Logger\PaymentLoggerInterface;
 
 abstract class AbstractPaymentGatewayFactory implements PaymentGatewayFactoryInterface
 {
@@ -10,7 +10,7 @@ abstract class AbstractPaymentGatewayFactory implements PaymentGatewayFactoryInt
     protected $config = array();
     protected $gateways = array();
 
-    public function __construct(PaymentLogger $paymentLogger, array $config)
+    public function __construct(PaymentLoggerInterface $paymentLogger, array $config)
     {
         $this->paymentLogger = $paymentLogger;
         $this->config = $config;

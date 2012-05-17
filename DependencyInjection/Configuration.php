@@ -22,6 +22,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('apiLoginId')->end()
                 ->scalarNode('transactionKey')->end()
                 ->scalarNode('postUrl')->end()
+                ->scalarNode('logger_service')->defaultValue('payment_gateway.payment_default_logger')->end()
                 ->scalarNode('logsPath')->end()
             ->end()
         ;

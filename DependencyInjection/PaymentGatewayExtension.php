@@ -2,10 +2,10 @@
 
 namespace Bundle\PaymentGatewayBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\FileLocator,
+    Symfony\Component\DependencyInjection\ContainerBuilder,
+    Symfony\Component\DependencyInjection\Loader\XmlFileLoader,
+    Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class PaymentGatewayExtension extends Extension
 {
@@ -19,6 +19,7 @@ class PaymentGatewayExtension extends Extension
         $loader->load('logger.xml');
         $loader->load('logs_warmer.xml');
 
+        $container->setAlias('payment_gateway.logger_service', $config['logger_service']);
         $container->setParameter('payment_gateway.authorizenet.config', $config);
     }
 
@@ -33,5 +34,4 @@ class PaymentGatewayExtension extends Extension
     {
         return 'payment_gateway';
     }
-
 }

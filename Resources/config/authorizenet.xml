@@ -4,7 +4,7 @@
 
     <services>
         <service id="payment_gateway.authorizenet_gateway_factory" class="Bundle\PaymentGatewayBundle\Gateway\AuthorizeNet\PaymentGatewayFactory">
-            <argument type="service" id="payment_gateway.payment_logger" />
+            <argument type="service" id="payment_gateway.logger_service" />
             <argument>%payment_gateway.authorizenet.config%</argument>
         </service>
     </services>

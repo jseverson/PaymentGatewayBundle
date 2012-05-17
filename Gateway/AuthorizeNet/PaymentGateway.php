@@ -2,7 +2,7 @@
 
 namespace Bundle\PaymentGatewayBundle\Gateway\AuthorizeNet;
 
-use Bundle\PaymentGatewayBundle\PaymentLogger;
+use Bundle\PaymentGatewayBundle\Logger\PaymentLoggerInterface;
 use Bundle\PaymentGatewayBundle\Gateway\AbstractPaymentGateway;
 
 class PaymentGateway extends AbstractPaymentGateway
@@ -52,7 +52,7 @@ class PaymentGateway extends AbstractPaymentGateway
         "description"         => "Sample Transaction",
     );
 
-    public function __construct(PaymentLogger $logger, array $config = array())
+    public function __construct(PaymentLoggerInterface $logger, array $config = array())
     {
         $this->logger = $logger;
         $this->config = array_merge($this->config, $config);
