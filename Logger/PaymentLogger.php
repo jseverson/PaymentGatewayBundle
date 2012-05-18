@@ -2,7 +2,9 @@
 
 namespace Bundle\PaymentGatewayBundle\Logger;
 
-class PaymentLogger
+use Bundle\PaymentGatewayBundle\Logger\PaymentLoggerInterface;
+
+class PaymentLogger implements PaymentLoggerInterface
 {
     public function __construct(array $config)
     {
