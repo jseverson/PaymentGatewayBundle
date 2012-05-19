@@ -3,9 +3,13 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="payment_gateway.payment_default_logger" class="Bundle\PaymentGatewayBundle\Logger\PaymentLogger">
+
+        <service id="payment_gateway.logger.null_logger" class="Bundle\PaymentGatewayBundle\Logger\NullLogger" />
+
+        <service id="payment_gateway.logger.file_logger" class="Bundle\PaymentGatewayBundle\Logger\FileLogger">
             <argument>%payment_gateway.authorizenet.config%</argument>
         </service>
+
     </services>
 
 </container>
